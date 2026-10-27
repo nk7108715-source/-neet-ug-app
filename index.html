@@ -1,0 +1,164 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEET UG Champion</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial;background:#f2f5fc;color:#172747}
+header{background:#123366;color:white;padding:24px 18px;border-radius:0 0 22px 22px}
+header h1{margin:0 0 8px}
+main{padding:16px;max-width:650px;margin:auto}
+.card{background:white;padding:18px;margin:14px 0;border-radius:15px;box-shadow:0 3px 12px #0000000a}
+select,button{font-size:16px;padding:12px;border-radius:9px}
+select{border:0;margin-top:10px}
+button{cursor:pointer}
+.primary{background:#1769e0;color:white;border:0;width:100%;margin-top:10px}
+.subjects{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.subject{background:white;border:1px solid #dce5f3;text-align:left;padding:15px;color:#172747}
+.subject strong{display:block;font-size:18px;margin:8px 0}
+.secondary{width:100%;border:0;background:#e7efff;color:#174d9b;margin-top:8px}
+.option{display:block;width:100%;text-align:left;margin:8px 0;background:#f1f5fc;border:1px solid #dce5f3}
+.hidden{display:none}
+footer{text-align:center;padding:20px;color:#66738a;font-size:13px}
+</style>
+</head>
+<body>
+<header>
+<h1>🎓 NEET UG Champion</h1>
+<p id="subtitle">Your NEET preparation starts here!</p>
+<label for="lang">Language / भाषा:</label><br>
+<select id="lang" onchange="setLanguage()">
+<option value="en">English</option>
+<option value="hi">हिन्दी</option>
+<option value="both">Both / दोनों</option>
+</select>
+</header>
+
+<main>
+<section id="home">
+<div class="card">
+<h2 id="welcome">Welcome, Future Doctor! 🩺</h2>
+<p id="intro">Learn Biology, Physics and Chemistry.</p>
+<button class="primary" onclick="startQuiz()" id="practice">Start MCQ Practice</button>
+<button class="secondary" onclick="startQuiz()" id="mock">Try Mock Test</button>
+</div>
+
+<h2 id="subjectsTitle">📚 Study Subjects</h2>
+<div class="subjects">
+<button class="subject" onclick="subject('Biology')">🧬<strong>Biology</strong><small>Botany & Zoology</small></button>
+<button class="subject" onclick="subject('Physics')">⚡<strong>Physics</strong><small>Concepts & Numericals</small></button>
+<button class="subject" onclick="subject('Chemistry')">🧪<strong>Chemistry</strong><small>Organic & Inorganic</small></button>
+<button class="subject" onclick="startQuiz()">📝<strong>MCQ Practice</strong><small>Test your knowledge</small></button>
+</div>
+
+<div class="card">
+<h3 id="premium">⭐ Premium Courses</h3>
+<p id="premiumText">Premium lessons and test series coming soon.</p>
+<p><small>Demo version: no payment is collected.</small></p>
+</div>
+</section>
+
+<section id="study" class="hidden">
+<button class="secondary" onclick="home()">← Home / होम</button>
+<div class="card">
+<h2 id="subjectName"></h2>
+<p id="studyText"></p>
+<h3 id="chapters"></h3>
+<p id="chapterInfo"></p>
+</div>
+</section>
+
+<section id="quiz" class="hidden">
+<button class="secondary" onclick="home()">← Home / होम</button>
+<div class="card">
+<p id="progress"></p>
+<h3 id="question"></h3>
+<div id="answers"></div>
+<p id="feedback"></p>
+<button class="primary" id="next" onclick="nextQuestion()" disabled>Next Question</button>
+</div>
+</section>
+
+<section id="result" class="hidden">
+<div class="card">
+<h2 id="resultTitle">Your Result</h2>
+<p id="score"></p>
+<button class="primary" onclick="startQuiz()">Try Again</button>
+<button class="secondary" onclick="home()">Home</button>
+</div>
+</section>
+</main>
+
+<footer>NEET UG Champion • Learn • Practice • Improve</footer>
+
+<script>
+let language="en",index=0,score=0,answered=false;
+const data=[
+{en:"Which organelle is called the powerhouse of the cell?",hi:"कोशिका का पावरहाउस किसे कहते हैं?",a:["Nucleus","Mitochondria","Ribosome","Golgi body"],b:["केंद्रक","माइटोकॉन्ड्रिया","राइबोसोम","गॉल्जी बॉडी"],correct:1},
+{en:"What is the SI unit of force?",hi:"बल की SI इकाई क्या है?",a:["Joule","Watt","Newton","Pascal"],b:["जूल","वाट","न्यूटन","पास्कल"],correct:2},
+{en:"What is the chemical symbol of sodium?",hi:"सोडियम का रासायनिक प्रतीक क्या है?",a:["So","S","Na","N"],b:["So","S","Na","N"],correct:2},
+{en:"Which molecule carries genetic information?",hi:"आनुवंशिक जानकारी कौन-सा अणु रखता है?",a:["DNA","Glucose","Water","Fat"],b:["DNA","ग्लूकोज़","पानी","वसा"],correct:0},
+{en:"What is the approximate speed of light in vacuum?",hi:"निर्वात में प्रकाश की लगभग चाल कितनी है?",a:["3 × 10⁸ m/s","300 m/s","1500 m/s","3 × 10⁴ m/s"],b:["3 × 10⁸ m/s","300 m/s","1500 m/s","3 × 10⁴ m/s"],correct:0},
+{en:"A solution with pH less than 7 is generally:",hi:"pH 7 से कम वाला विलयन सामान्यतः कैसा होता है?",a:["Acidic","Basic","Neutral","Salty"],b:["अम्लीय","क्षारीय","उदासीन","नमकीन"],correct:0}
+];
+
+function setLanguage(){
+language=document.getElementById("lang").value;
+const hi=language==="hi",both=language==="both";
+const put=(id,en,h,b)=>document.getElementById(id).textContent=both?b:(hi?h:en);
+put("subtitle","Your NEET preparation starts here!","NEET की तैयारी यहाँ शुरू करें!","NEET preparation / NEET की तैयारी");
+put("welcome","Welcome, Future Doctor! 🩺","भविष्य के डॉक्टर, स्वागत है! 🩺","Welcome / स्वागत है, Future Doctor!");
+put("intro","Learn Biology, Physics and Chemistry.","जीव विज्ञान, भौतिकी और रसायन विज्ञान पढ़ें।","Study all subjects / सभी विषय पढ़ें।");
+put("practice","Start MCQ Practice","MCQ अभ्यास शुरू करें","MCQ Practice / अभ्यास");
+put("mock","Try Mock Test","मॉक टेस्ट दें","Mock Test / मॉक टेस्ट");
+put("subjectsTitle","📚 Study Subjects","📚 पढ़ाई के विषय","📚 Subjects / विषय");
+put("premium","⭐ Premium Courses","⭐ प्रीमियम कोर्स","⭐ Premium Courses / प्रीमियम कोर्स");
+put("premiumText","Premium lessons and test series coming soon.","प्रीमियम पाठ और टेस्ट सीरीज़ जल्द आएँगे।","Premium content coming soon / जल्द आएगा");
+if(!document.getElementById("quiz").classList.contains("hidden"))renderQuestion();
+}
+function hide(){["home","study","quiz","result"].forEach(id=>document.getElementById(id).classList.add("hidden"))}
+function home(){hide();document.getElementById("home").classList.remove("hidden")}
+function subject(name){
+hide();document.getElementById("study").classList.remove("hidden");
+document.getElementById("subjectName").textContent=name;
+document.getElementById("studyText").textContent=language==="hi"?"इस विषय की अध्ययन सामग्री जल्द जोड़ी जाएगी।":"Study material for "+name+" will be added soon.";
+document.getElementById("chapters").textContent=language==="hi"?"अध्याय":"Chapters";
+document.getElementById("chapterInfo").textContent=language==="hi"?"नोट्स और प्रश्न जल्द उपलब्ध होंगे।":"Chapter notes and questions coming soon.";
+}
+function startQuiz(){index=0;score=0;hide();document.getElementById("quiz").classList.remove("hidden");renderQuestion()}
+function renderQuestion(){
+if(index>=data.length){showResult();return}
+answered=false;
+let q=data[index],hi=language==="hi",both=language==="both";
+document.getElementById("progress").textContent=(hi?"प्रश्न":both?"Question / प्रश्न":"Question")+" "+(index+1)+" / "+data.length;
+document.getElementById("question").textContent=both?q.en+"\n"+q.hi:(hi?q.hi:q.en);
+document.getElementById("feedback").textContent="";
+document.getElementById("next").disabled=true;
+let box=document.getElementById("answers");box.innerHTML="";
+(hi?q.b:q.a).forEach((answer,i)=>{
+let btn=document.createElement("button");btn.className="option";btn.textContent=String.fromCharCode(65+i)+". "+answer;btn.onclick=()=>choose(i,btn);box.appendChild(btn);
+});
+}
+function choose(i){
+if(answered)return;answered=true;
+let q=data[index];if(i===q.correct)score++;
+document.querySelectorAll("#answers button").forEach((b,j)=>{
+b.disabled=true;
+if(j===q.correct){b.style.background="#d8f8e3";b.style.borderColor="green"}
+});
+document.getElementById("feedback").textContent=i===q.correct?(language==="hi"?"सही जवाब! 🎉":"Correct answer! 🎉"):(language==="hi"?"सही जवाब: ":"Correct answer: ")+(language==="hi"?q.b[q.correct]:q.a[q.correct]);
+document.getElementById("next").disabled=false;
+}
+function nextQuestion(){if(!answered)return;index++;renderQuestion()}
+function showResult(){
+hide();document.getElementById("result").classList.remove("hidden");
+document.getElementById("resultTitle").textContent=language==="hi"?"आपका परिणाम":"Your Result";
+document.getElementById("score").textContent=(language==="hi"?"आपका स्कोर: ":"Your score: ")+score+" / "+data.length;
+}
+setLanguage();
+</script>
+</body>
+</html>
